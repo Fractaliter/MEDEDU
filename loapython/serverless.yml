@@ -1,0 +1,41 @@
+org: loapython
+app: loapython
+service: loapython
+
+provider:
+  name: aws
+  runtime: python3.12
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  getPatient:
+    handler: handler.get_patient
+    events:
+      - httpApi:
+          path: /patient/{id}
+          method: get
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    PatientsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Patients
+        AttributeDefinitions:
+          - AttributeName: PatientID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PatientID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
